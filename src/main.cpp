@@ -18,6 +18,15 @@ int main() {
     page.set_header("Content-Type", "text/html; charset=utf-8");
     return page;
   });
+  CROW_ROUTE(app, "/features").methods("GET"_method)
+  ([]() {
+    std::ifstream file("frontend/features.html");
+    std::stringstream buffer;
+    buffer << file.rdbuf();
+    auto page = crow::response(buffer.str());
+    page.set_header("Content-Type", "text/html; charset=utf-8");
+    return page;
+  });
   CROW_ROUTE(app, "/app").methods("GET"_method)
   ([]() {
     std::ifstream file("frontend/index.html");
