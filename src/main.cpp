@@ -66,6 +66,7 @@ int main() {
     buffer << file.rdbuf();
     auto page = crow::response(buffer.str());
     page.set_header("Content-Type", "application/json");
+    add_security_headers(page);
     return page;
   });
   CROW_ROUTE(app, "/service-worker.js").methods("GET"_method)
