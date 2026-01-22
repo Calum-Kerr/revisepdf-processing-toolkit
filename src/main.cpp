@@ -26,6 +26,7 @@ int main() {
     buffer << file.rdbuf();
     auto page = crow::response(buffer.str());
     page.set_header("Content-Type", "text/html; charset=utf-8");
+    add_security_headers(page);
     return page;
   });
   CROW_ROUTE(app, "/features").methods("GET"_method)
