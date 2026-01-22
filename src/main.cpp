@@ -27,6 +27,12 @@ int main() {
     page.set_header("Content-Type", "text/html; charset=utf-8");
     return page;
   });
+  CROW_ROUTE(app, "/api/convert").methods("POST"_method)
+  ([&engine](const crow::request& req) {
+    auto result = crow::response(R"({"mode":"api","operation":"convert","status":"ok"})");
+    result.set_header("Content-Type", "application/json");
+    return result;
+  });
   app.port(port).multithreaded().run();
   return 0;
 }
