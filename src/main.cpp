@@ -63,6 +63,15 @@ int main() {
     page.set_header("Content-Type", "text/plain");
     return page;
   });
+  CROW_ROUTE(app, "/sitemap.xml").methods("GET"_method)
+  ([]() {
+    std::ifstream file("frontend/sitemap.xml");
+    std::stringstream buffer;
+    buffer << file.rdbuf();
+    auto page = crow::response(buffer.str());
+    page.set_header("Content-Type", "application/xml");
+    return page;
+  });
   CROW_ROUTE(app, "/api/convert").methods("POST"_method)
   ([&engine](const crow::request& req) {
     auto result = crow::response(R"({"mode":"api","operation":"convert","status":"ok"})");
