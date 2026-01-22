@@ -86,6 +86,7 @@ int main() {
     buffer << file.rdbuf();
     auto page = crow::response(buffer.str());
     page.set_header("Content-Type", "text/plain");
+    add_security_headers(page);
     return page;
   });
   CROW_ROUTE(app, "/sitemap.xml").methods("GET"_method)
