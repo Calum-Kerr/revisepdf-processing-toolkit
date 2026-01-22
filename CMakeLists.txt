@@ -1,0 +1,7 @@
+cmake_minimum_required(VERSION 3.20)
+project(revisepdf CXX)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+find_package(crow CONFIG REQUIRED)
+add_executable(revisepdf src/main.cpp src/engine.cpp)
+target_link_libraries(revisepdf PRIVATE crow::crow)
