@@ -103,6 +103,7 @@ int main() {
   ([&engine](const crow::request& req) {
     auto result = crow::response(R"({"mode":"api","operation":"convert","status":"ok"})");
     result.set_header("Content-Type", "application/json");
+    add_security_headers(result);
     return result;
   });
   CROW_ROUTE(app, "/api/compress").methods("POST"_method)
