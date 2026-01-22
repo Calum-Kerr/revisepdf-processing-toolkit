@@ -3,6 +3,15 @@
 #include <fstream>
 #include <sstream>
 #include <functional>
+void add_security_headers(crow::response& res) {
+  res.set_header("Content-Security-Policy", "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'");
+  res.set_header("X-Content-Type-Options", "nosniff");
+  res.set_header("X-Frame-Options", "DENY");
+  res.set_header("X-XSS-Protection", "1; mode=block");
+  res.set_header("Strict-Transport-Security", "max-age=31536000; includeSubDomains; preload");
+  res.set_header("Referrer-Policy", "no-referrer");
+  res.set_header("Permissions-Policy", "geolocation=(), microphone=(), camera=()");
+}
 int main() {
   crow::SimpleApp app;
   PdfEngine engine;
