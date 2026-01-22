@@ -45,6 +45,15 @@ int main() {
     page.set_header("Content-Type", "application/json");
     return page;
   });
+  CROW_ROUTE(app, "/service-worker.js").methods("GET"_method)
+  ([]() {
+    std::ifstream file("frontend/service-worker.js");
+    std::stringstream buffer;
+    buffer << file.rdbuf();
+    auto page = crow::response(buffer.str());
+    page.set_header("Content-Type", "application/javascript");
+    return page;
+  });
   CROW_ROUTE(app, "/api/convert").methods("POST"_method)
   ([&engine](const crow::request& req) {
     auto result = crow::response(R"({"mode":"api","operation":"convert","status":"ok"})");
