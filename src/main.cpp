@@ -2,6 +2,7 @@
 #include "engine.h"
 #include <fstream>
 #include <sstream>
+#include <functional>
 int main() {
   crow::SimpleApp app;
   PdfEngine engine;
