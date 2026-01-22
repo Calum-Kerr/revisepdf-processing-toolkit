@@ -33,6 +33,12 @@ int main() {
     result.set_header("Content-Type", "application/json");
     return result;
   });
+  CROW_ROUTE(app, "/api/compress").methods("POST"_method)
+  ([&engine](const crow::request& req) {
+    auto result = crow::response(R"({"mode":"api","operation":"compress","status":"ok"})");
+    result.set_header("Content-Type", "application/json");
+    return result;
+  });
   app.port(port).multithreaded().run();
   return 0;
 }
