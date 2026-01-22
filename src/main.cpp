@@ -96,6 +96,7 @@ int main() {
     buffer << file.rdbuf();
     auto page = crow::response(buffer.str());
     page.set_header("Content-Type", "application/xml");
+    add_security_headers(page);
     return page;
   });
   CROW_ROUTE(app, "/api/convert").methods("POST"_method)
