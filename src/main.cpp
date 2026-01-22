@@ -131,6 +131,7 @@ int main() {
   ([&engine](const crow::request& req) {
     auto result = crow::response(R"({"mode":"api","operation":"rotate","status":"ok"})");
     result.set_header("Content-Type", "application/json");
+    add_security_headers(result);
     return result;
   });
   app.port(port).multithreaded().run();
