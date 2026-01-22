@@ -124,6 +124,7 @@ int main() {
   ([&engine](const crow::request& req) {
     auto result = crow::response(R"({"mode":"api","operation":"split","status":"ok"})");
     result.set_header("Content-Type", "application/json");
+    add_security_headers(result);
     return result;
   });
   CROW_ROUTE(app, "/api/rotate").methods("POST"_method)
