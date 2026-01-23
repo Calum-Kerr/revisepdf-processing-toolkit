@@ -141,120 +141,152 @@ int main() {
   });
   CROW_ROUTE(app, "/api/convert").methods("POST"_method)
   ([&engine](const crow::request& req) {
-    json response;
     if (req.body.empty()) {
-      response = {{"mode", "api"}, {"operation", "convert"}, {"status", "error"}, {"message", "no file provided"}};
-    } else {
-      std::string input_file = "/tmp/input_" + std::to_string(std::time(nullptr)) + ".pdf";
-      std::string output_file = "/tmp/output_" + std::to_string(std::time(nullptr)) + ".jpg";
-      std::ofstream out(input_file, std::ios::binary);
-      out.write(req.body.c_str(), req.body.size());
-      out.close();
-      auto op = engine.pdf_to_jpg(input_file, output_file);
-      std::ifstream in(output_file, std::ios::binary);
-      if (in.good()) {
-        std::string file_content((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
-        in.close();
-        response = {{"mode", "api"}, {"operation", "convert"}, {"status", "ok"}, {"size", file_content.size()}};
-        std::remove(input_file.c_str());
-        std::remove(output_file.c_str());
-      } else {
-        response = {{"mode", "api"}, {"operation", "convert"}, {"status", "error"}, {"message", "conversion failed"}};
-        std::remove(input_file.c_str());
-      }
+      json response = {{"mode", "api"}, {"operation", "convert"}, {"status", "error"}, {"message", "no file provided"}};
+      auto result = crow::response(response.dump());
+      result.set_header("Content-Type", "application/json");
+      result.code = 400;
+      add_security_headers(result);
+      return result;
     }
-    auto result = crow::response(response.dump());
-    result.set_header("Content-Type", "application/json");
-    add_security_headers(result);
-    return result;
+    std::string input_file = "/tmp/input_" + std::to_string(std::time(nullptr)) + std::to_string(rand()) + ".pdf";
+    std::string output_file = "/tmp/output_" + std::to_string(std::time(nullptr)) + std::to_string(rand()) + ".jpg";
+    std::ofstream out(input_file, std::ios::binary);
+    out.write(req.body.c_str(), req.body.size());
+    out.close();
+    auto op = engine.pdf_to_jpg(input_file, output_file);
+    std::ifstream in(output_file, std::ios::binary);
+    if (in.good()) {
+      std::string file_content((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
+      in.close();
+      auto result = crow::response(file_content);
+      result.set_header("Content-Type", "image/jpeg");
+      result.set_header("Content-Disposition", "attachment; filename=\"converted.jpg\"");
+      add_security_headers(result);
+      std::remove(input_file.c_str());
+      std::remove(output_file.c_str());
+      return result;
+    } else {
+      json response = {{"mode", "api"}, {"operation", "convert"}, {"status", "error"}, {"message", "conversion failed"}};
+      auto result = crow::response(response.dump());
+      result.set_header("Content-Type", "application/json");
+      result.code = 500;
+      add_security_headers(result);
+      std::remove(input_file.c_str());
+      return result;
+    }
   });
   CROW_ROUTE(app, "/api/compress").methods("POST"_method)
   ([&engine](const crow::request& req) {
-    json response;
     if (req.body.empty()) {
-      response = {{"mode", "api"}, {"operation", "compress"}, {"status", "error"}, {"message", "no file provided"}};
-    } else {
-      std::string input_file = "/tmp/input_" + std::to_string(std::time(nullptr)) + ".pdf";
-      std::string output_file = "/tmp/output_" + std::to_string(std::time(nullptr)) + ".pdf";
-      std::ofstream out(input_file, std::ios::binary);
-      out.write(req.body.c_str(), req.body.size());
-      out.close();
-      auto op = engine.compress(input_file, output_file);
-      std::ifstream in(output_file, std::ios::binary);
-      if (in.good()) {
-        std::string file_content((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
-        in.close();
-        response = {{"mode", "api"}, {"operation", "compress"}, {"status", "ok"}, {"size", file_content.size()}};
-        std::remove(input_file.c_str());
-        std::remove(output_file.c_str());
-      } else {
-        response = {{"mode", "api"}, {"operation", "compress"}, {"status", "error"}, {"message", "compression failed"}};
-        std::remove(input_file.c_str());
-      }
+      json response = {{"mode", "api"}, {"operation", "compress"}, {"status", "error"}, {"message", "no file provided"}};
+      auto result = crow::response(response.dump());
+      result.set_header("Content-Type", "application/json");
+      result.code = 400;
+      add_security_headers(result);
+      return result;
     }
-    auto result = crow::response(response.dump());
-    result.set_header("Content-Type", "application/json");
-    add_security_headers(result);
-    return result;
+    std::string input_file = "/tmp/input_" + std::to_string(std::time(nullptr)) + std::to_string(rand()) + ".pdf";
+    std::string output_file = "/tmp/output_" + std::to_string(std::time(nullptr)) + std::to_string(rand()) + ".pdf";
+    std::ofstream out(input_file, std::ios::binary);
+    out.write(req.body.c_str(), req.body.size());
+    out.close();
+    auto op = engine.compress(input_file, output_file);
+    std::ifstream in(output_file, std::ios::binary);
+    if (in.good()) {
+      std::string file_content((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
+      in.close();
+      auto result = crow::response(file_content);
+      result.set_header("Content-Type", "application/pdf");
+      result.set_header("Content-Disposition", "attachment; filename=\"compressed.pdf\"");
+      add_security_headers(result);
+      std::remove(input_file.c_str());
+      std::remove(output_file.c_str());
+      return result;
+    } else {
+      json response = {{"mode", "api"}, {"operation", "compress"}, {"status", "error"}, {"message", "compression failed"}};
+      auto result = crow::response(response.dump());
+      result.set_header("Content-Type", "application/json");
+      result.code = 500;
+      add_security_headers(result);
+      std::remove(input_file.c_str());
+      return result;
+    }
   });
   CROW_ROUTE(app, "/api/merge").methods("POST"_method)
   ([&engine](const crow::request& req) {
-    json response;
     if (req.body.empty()) {
-      response = {{"mode", "api"}, {"operation", "merge"}, {"status", "error"}, {"message", "no file provided"}};
-    } else {
-      std::string input_file = "/tmp/input_" + std::to_string(std::time(nullptr)) + ".pdf";
-      std::string output_file = "/tmp/output_" + std::to_string(std::time(nullptr)) + ".pdf";
-      std::ofstream out(input_file, std::ios::binary);
-      out.write(req.body.c_str(), req.body.size());
-      out.close();
-      std::vector<std::string> inputs = {input_file};
-      auto op = engine.merge(inputs, output_file);
-      std::ifstream in(output_file, std::ios::binary);
-      if (in.good()) {
-        std::string file_content((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
-        in.close();
-        response = {{"mode", "api"}, {"operation", "merge"}, {"status", "ok"}, {"size", file_content.size()}};
-        std::remove(input_file.c_str());
-        std::remove(output_file.c_str());
-      } else {
-        response = {{"mode", "api"}, {"operation", "merge"}, {"status", "error"}, {"message", "merge failed"}};
-        std::remove(input_file.c_str());
-      }
+      json response = {{"mode", "api"}, {"operation", "merge"}, {"status", "error"}, {"message", "no file provided"}};
+      auto result = crow::response(response.dump());
+      result.set_header("Content-Type", "application/json");
+      result.code = 400;
+      add_security_headers(result);
+      return result;
     }
-    auto result = crow::response(response.dump());
-    result.set_header("Content-Type", "application/json");
-    add_security_headers(result);
-    return result;
+    std::string input_file = "/tmp/input_" + std::to_string(std::time(nullptr)) + std::to_string(rand()) + ".pdf";
+    std::string output_file = "/tmp/output_" + std::to_string(std::time(nullptr)) + std::to_string(rand()) + ".pdf";
+    std::ofstream out(input_file, std::ios::binary);
+    out.write(req.body.c_str(), req.body.size());
+    out.close();
+    std::vector<std::string> inputs = {input_file};
+    auto op = engine.merge(inputs, output_file);
+    std::ifstream in(output_file, std::ios::binary);
+    if (in.good()) {
+      std::string file_content((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
+      in.close();
+      auto result = crow::response(file_content);
+      result.set_header("Content-Type", "application/pdf");
+      result.set_header("Content-Disposition", "attachment; filename=\"merged.pdf\"");
+      add_security_headers(result);
+      std::remove(input_file.c_str());
+      std::remove(output_file.c_str());
+      return result;
+    } else {
+      json response = {{"mode", "api"}, {"operation", "merge"}, {"status", "error"}, {"message", "merge failed"}};
+      auto result = crow::response(response.dump());
+      result.set_header("Content-Type", "application/json");
+      result.code = 500;
+      add_security_headers(result);
+      std::remove(input_file.c_str());
+      return result;
+    }
   });
   CROW_ROUTE(app, "/api/split").methods("POST"_method)
   ([&engine](const crow::request& req) {
-    json response;
     if (req.body.empty()) {
-      response = {{"mode", "api"}, {"operation", "split"}, {"status", "error"}, {"message", "no file provided"}};
-    } else {
-      std::string input_file = "/tmp/input_" + std::to_string(std::time(nullptr)) + ".pdf";
-      std::string output_file = "/tmp/output_" + std::to_string(std::time(nullptr)) + ".pdf";
-      std::ofstream out(input_file, std::ios::binary);
-      out.write(req.body.c_str(), req.body.size());
-      out.close();
-      auto op = engine.split(input_file, output_file);
-      std::ifstream in(output_file, std::ios::binary);
-      if (in.good()) {
-        std::string file_content((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
-        in.close();
-        response = {{"mode", "api"}, {"operation", "split"}, {"status", "ok"}, {"size", file_content.size()}};
-        std::remove(input_file.c_str());
-        std::remove(output_file.c_str());
-      } else {
-        response = {{"mode", "api"}, {"operation", "split"}, {"status", "error"}, {"message", "split failed"}};
-        std::remove(input_file.c_str());
-      }
+      json response = {{"mode", "api"}, {"operation", "split"}, {"status", "error"}, {"message", "no file provided"}};
+      auto result = crow::response(response.dump());
+      result.set_header("Content-Type", "application/json");
+      result.code = 400;
+      add_security_headers(result);
+      return result;
     }
-    auto result = crow::response(response.dump());
-    result.set_header("Content-Type", "application/json");
-    add_security_headers(result);
-    return result;
+    std::string input_file = "/tmp/input_" + std::to_string(std::time(nullptr)) + std::to_string(rand()) + ".pdf";
+    std::string output_file = "/tmp/output_" + std::to_string(std::time(nullptr)) + std::to_string(rand()) + ".pdf";
+    std::ofstream out(input_file, std::ios::binary);
+    out.write(req.body.c_str(), req.body.size());
+    out.close();
+    auto op = engine.split(input_file, output_file);
+    std::ifstream in(output_file, std::ios::binary);
+    if (in.good()) {
+      std::string file_content((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
+      in.close();
+      auto result = crow::response(file_content);
+      result.set_header("Content-Type", "application/pdf");
+      result.set_header("Content-Disposition", "attachment; filename=\"split.pdf\"");
+      add_security_headers(result);
+      std::remove(input_file.c_str());
+      std::remove(output_file.c_str());
+      return result;
+    } else {
+      json response = {{"mode", "api"}, {"operation", "split"}, {"status", "error"}, {"message", "split failed"}};
+      auto result = crow::response(response.dump());
+      result.set_header("Content-Type", "application/json");
+      result.code = 500;
+      add_security_headers(result);
+      std::remove(input_file.c_str());
+      return result;
+    }
   });
   CROW_ROUTE(app, "/api/rotate").methods("POST"_method)
   ([&engine](const crow::request& req) {
