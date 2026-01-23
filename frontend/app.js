@@ -62,7 +62,7 @@ async function handleFileUpload(tool, file) {
         body: file
       });
       const contentType = response.headers.get('content-type') || '';
-      if (contentType.includes('application/pdf') || contentType.includes('image/jpeg')) {
+      if (contentType.includes('application/pdf') || contentType.includes('image/jpeg') || contentType.includes('application/zip')) {
         const blob = await response.blob();
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
