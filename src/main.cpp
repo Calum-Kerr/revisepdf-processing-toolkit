@@ -66,16 +66,26 @@ int main() {
   CROW_ROUTE(app, "/algorithms.js").methods("GET"_method)
   ([]() {
     std::ifstream file("frontend/algorithms.js", std::ios::binary);
+    if (!file.good()) {
+      auto page = crow::response("");
+      page.code = 404;
+      return page;
+    }
     std::stringstream buffer;
     buffer << file.rdbuf();
     auto page = crow::response(buffer.str());
-    page.set_header("Content-Type", "application/javascript");
+    page.set_header("Content-Type", "application/javascript; charset=utf-8");
     add_security_headers(page);
     return page;
   });
   CROW_ROUTE(app, "/algorithms.wasm").methods("GET"_method)
   ([]() {
     std::ifstream file("frontend/algorithms.wasm", std::ios::binary);
+    if (!file.good()) {
+      auto page = crow::response("");
+      page.code = 404;
+      return page;
+    }
     std::vector<char> buffer((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
     auto page = crow::response(std::string(buffer.begin(), buffer.end()));
     page.set_header("Content-Type", "application/wasm");
