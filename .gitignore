@@ -19,3 +19,4 @@ Thumbs.db
 *.app
 CMakeUserPresets.json
 .env
+test.pdf
