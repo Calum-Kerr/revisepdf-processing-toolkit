@@ -103,12 +103,11 @@ int main() {
   });
   CROW_ROUTE(app, "/api/convert").methods("POST"_method)
   ([&engine](const crow::request& req) {
-    auto part = req.get_part_by_name("file");
     json response;
-    if (part.body.empty()) {
+    if (req.body.empty()) {
       response = {{"mode", "api"}, {"operation", "convert"}, {"status", "error"}, {"message", "no file provided"}};
     } else {
-      response = {{"mode", "api"}, {"operation", "convert"}, {"status", "ok"}, {"size", part.body.size()}};
+      response = {{"mode", "api"}, {"operation", "convert"}, {"status", "ok"}, {"size", req.body.size()}};
     }
     auto result = crow::response(response.dump());
     result.set_header("Content-Type", "application/json");
@@ -117,12 +116,11 @@ int main() {
   });
   CROW_ROUTE(app, "/api/compress").methods("POST"_method)
   ([&engine](const crow::request& req) {
-    auto part = req.get_part_by_name("file");
     json response;
-    if (part.body.empty()) {
+    if (req.body.empty()) {
       response = {{"mode", "api"}, {"operation", "compress"}, {"status", "error"}, {"message", "no file provided"}};
     } else {
-      response = {{"mode", "api"}, {"operation", "compress"}, {"status", "ok"}, {"size", part.body.size()}};
+      response = {{"mode", "api"}, {"operation", "compress"}, {"status", "ok"}, {"size", req.body.size()}};
     }
     auto result = crow::response(response.dump());
     result.set_header("Content-Type", "application/json");
