@@ -4,10 +4,16 @@ RUN apt-get update && apt-get install -y \
   cmake \
   git \
   ghostscript \
+  curl \
+  pkg-config \
   && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 COPY . .
-RUN mkdir -p build && cd build && cmake .. && make
+RUN git clone https://github.com/Microsoft/vcpkg.git && \
+  ./vcpkg/bootstrap-vcpkg.sh && \
+  mkdir -p build && cd build && \
+  cmake .. -DCMAKE_TOOLCHAIN_FILE=../vcpkg/scripts/buildsystems/vcpkg.cmake && \
+  make
 EXPOSE 8080
 CMD ["./build/revisepdf"]
 
