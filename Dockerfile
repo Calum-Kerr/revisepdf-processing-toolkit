@@ -6,6 +6,9 @@ RUN apt-get update && apt-get install -y \
   ghostscript \
   curl \
   pkg-config \
+  zip \
+  unzip \
+  tar \
   && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 COPY . .
