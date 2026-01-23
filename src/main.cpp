@@ -268,16 +268,17 @@ int main() {
     out.write(req.body.c_str(), req.body.size());
     out.close();
     auto op = engine.split(input_file, output_file);
-    std::ifstream in(output_file, std::ios::binary);
+    std::string actual_output = op.output;
+    std::ifstream in(actual_output, std::ios::binary);
     if (in.good()) {
       std::string file_content((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
       in.close();
       auto result = crow::response(file_content);
-      result.set_header("Content-Type", "application/pdf");
-      result.set_header("Content-Disposition", "attachment; filename=\"split.pdf\"");
+      result.set_header("Content-Type", "application/zip");
+      result.set_header("Content-Disposition", "attachment; filename=\"split.zip\"");
       add_security_headers(result);
       std::remove(input_file.c_str());
-      std::remove(output_file.c_str());
+      std::remove(actual_output.c_str());
       return result;
     } else {
       json response = {{"mode", "api"}, {"operation", "split"}, {"status", "error"}, {"message", "split failed"}};
