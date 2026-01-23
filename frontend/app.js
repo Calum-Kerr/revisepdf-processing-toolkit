@@ -57,13 +57,27 @@ async function handleFileUpload(tool, file) {
       }
     }
     if (!result) {
-      const formData = new FormData();
-      formData.append('file', file);
       const response = await fetch(`/api/${tool}`, {
         method: 'POST',
         body: file
       });
-      result = await response.json();
+      const contentType = response.headers.get('content-type') || '';
+      if (response.ok && (contentType.includes('application/pdf') || contentType.includes('image/jpeg'))) {
+        const blob = await response.blob();
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        const filename = response.headers.get('content-disposition')?.split('filename=')[1]?.replace(/"/g, '') || `${tool}-output`;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        resultDiv.innerHTML = `<p>Downloaded: ${filename}</p>`;
+        return;
+      } else {
+        result = await response.json();
+      }
     }
     resultDiv.innerHTML = `<p>Mode: ${result.mode}</p><p>Status: ${result.status}</p>`;
   } catch (err) {
