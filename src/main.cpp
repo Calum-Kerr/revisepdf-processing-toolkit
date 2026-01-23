@@ -102,6 +102,13 @@ int main() {
     add_security_headers(page);
     return page;
   });
+  CROW_ROUTE(app, "/favicon.ico").methods("GET"_method)
+  ([]() {
+    auto page = crow::response("");
+    page.set_header("Content-Type", "image/x-icon");
+    page.code = 204;
+    return page;
+  });
   CROW_ROUTE(app, "/robots.txt").methods("GET"_method)
   ([]() {
     std::ifstream file("frontend/robots.txt");
