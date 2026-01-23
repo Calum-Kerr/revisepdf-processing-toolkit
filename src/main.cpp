@@ -167,7 +167,24 @@ int main() {
     if (req.body.empty()) {
       response = {{"mode", "api"}, {"operation", "merge"}, {"status", "error"}, {"message", "no file provided"}};
     } else {
-      response = {{"mode", "api"}, {"operation", "merge"}, {"status", "ok"}, {"size", req.body.size()}};
+      std::string input_file = "/tmp/input_" + std::to_string(std::time(nullptr)) + ".pdf";
+      std::string output_file = "/tmp/output_" + std::to_string(std::time(nullptr)) + ".pdf";
+      std::ofstream out(input_file, std::ios::binary);
+      out.write(req.body.c_str(), req.body.size());
+      out.close();
+      std::vector<std::string> inputs = {input_file};
+      auto op = engine.merge(inputs, output_file);
+      std::ifstream in(output_file, std::ios::binary);
+      if (in.good()) {
+        std::string file_content((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
+        in.close();
+        response = {{"mode", "api"}, {"operation", "merge"}, {"status", "ok"}, {"size", file_content.size()}};
+        std::remove(input_file.c_str());
+        std::remove(output_file.c_str());
+      } else {
+        response = {{"mode", "api"}, {"operation", "merge"}, {"status", "error"}, {"message", "merge failed"}};
+        std::remove(input_file.c_str());
+      }
     }
     auto result = crow::response(response.dump());
     result.set_header("Content-Type", "application/json");
