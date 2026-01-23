@@ -63,6 +63,25 @@ int main() {
     add_security_headers(page);
     return page;
   });
+  CROW_ROUTE(app, "/algorithms.js").methods("GET"_method)
+  ([]() {
+    std::ifstream file("frontend/algorithms.js", std::ios::binary);
+    std::stringstream buffer;
+    buffer << file.rdbuf();
+    auto page = crow::response(buffer.str());
+    page.set_header("Content-Type", "application/javascript");
+    add_security_headers(page);
+    return page;
+  });
+  CROW_ROUTE(app, "/algorithms.wasm").methods("GET"_method)
+  ([]() {
+    std::ifstream file("frontend/algorithms.wasm", std::ios::binary);
+    std::vector<char> buffer((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+    auto page = crow::response(std::string(buffer.begin(), buffer.end()));
+    page.set_header("Content-Type", "application/wasm");
+    add_security_headers(page);
+    return page;
+  });
   CROW_ROUTE(app, "/manifest.json").methods("GET"_method)
   ([]() {
     std::ifstream file("frontend/manifest.json");
