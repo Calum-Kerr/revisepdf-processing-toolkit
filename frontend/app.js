@@ -46,13 +46,25 @@ async function handleFileUpload(tool, file) {
   resultDiv.innerHTML = '<p>Processing...</p>';
   resultDiv.classList.add('active');
   try {
-    const formData = new FormData();
-    formData.append('file', file);
-    const response = await fetch(`/api/${tool}`, {
-      method: 'POST',
-      body: formData
-    });
-    const result = await response.json();
+    let result = null;
+    if (window.Module && window.Module.ccall) {
+      try {
+        const fileData = await file.arrayBuffer();
+        const wasmResult = window.Module.ccall(tool, 'string', ['array', 'number'], [new Uint8Array(fileData), fileData.byteLength]);
+        result = JSON.parse(wasmResult);
+      } catch (wasmErr) {
+        console.log('WASM failed, falling back to API:', wasmErr);
+      }
+    }
+    if (!result) {
+      const formData = new FormData();
+      formData.append('file', file);
+      const response = await fetch(`/api/${tool}`, {
+        method: 'POST',
+        body: file
+      });
+      result = await response.json();
+    }
     resultDiv.innerHTML = `<p>Mode: ${result.mode}</p><p>Status: ${result.status}</p>`;
   } catch (err) {
     resultDiv.innerHTML = `<p>Error: ${err.message}</p>`;
