@@ -2,39 +2,29 @@
 #include <cstdlib>
 #include <sstream>
 #include <fstream>
-#ifdef _WIN32
-#define GS_CMD "gswin64c.exe"
-#else
-#define GS_CMD "gs"
-#endif
 PdfEngine::PdfEngine() {}
 PdfEngine::~PdfEngine() {}
 PdfOperation PdfEngine::pdf_to_jpg(const std::string& input, const std::string& output) {
   std::ostringstream cmd;
-  cmd << GS_CMD << " -q -dNOPAUSE -dBATCH -dSAFER -sDEVICE=jpeg -r150 -sOutputFile=\"" << output << "\" \"" << input << "\"";
+  cmd << "gs -q -dNOPAUSE -dBATCH -dSAFER -sDEVICE=jpeg -r150 -sOutputFile=\"" << output << "\" \"" << input << "\"";
   int result = std::system(cmd.str().c_str());
-  if (result != 0) {
-    std::ofstream dummy(output, std::ios::binary);
-    dummy.write("dummy", 5);
-    dummy.close();
-  }
-  return {input, output, "pdf_to_jpg", "api"};
+  return {input, output, "pdf_to_jpg", result == 0 ? "api" : "error"};
 }
 PdfOperation PdfEngine::pdf_to_pdfa(const std::string& input, const std::string& output) {
   std::ostringstream cmd;
-  cmd << GS_CMD << " -q -dNOPAUSE -dBATCH -dSAFER -dPDFA=1 -sOutputFile=\"" << output << "\" \"" << input << "\"";
+  cmd << "gs -q -dNOPAUSE -dBATCH -dSAFER -dPDFA=1 -sOutputFile=\"" << output << "\" \"" << input << "\"";
   int result = std::system(cmd.str().c_str());
   return {input, output, "pdf_to_pdfa", result == 0 ? "api" : "error"};
 }
 PdfOperation PdfEngine::compress(const std::string& input, const std::string& output) {
   std::ostringstream cmd;
-  cmd << GS_CMD << " -q -dNOPAUSE -dBATCH -dSAFER -sDEVICE=pdfwrite -dCompatibilityLevel=1.4 -dPDFSETTINGS=/ebook -sOutputFile=\"" << output << "\" \"" << input << "\"";
+  cmd << "gs -q -dNOPAUSE -dBATCH -dSAFER -sDEVICE=pdfwrite -dCompatibilityLevel=1.4 -dPDFSETTINGS=/ebook -sOutputFile=\"" << output << "\" \"" << input << "\"";
   int result = std::system(cmd.str().c_str());
   return {input, output, "compress", result == 0 ? "api" : "error"};
 }
 PdfOperation PdfEngine::merge(const std::vector<std::string>& inputs, const std::string& output) {
   std::ostringstream cmd;
-  cmd << GS_CMD << " -q -dNOPAUSE -dBATCH -dSAFER -sDEVICE=pdfwrite -sOutputFile=\"" << output << "\"";
+  cmd << "gs -q -dNOPAUSE -dBATCH -dSAFER -sDEVICE=pdfwrite -sOutputFile=\"" << output << "\"";
   for (const auto& input : inputs) {
     cmd << " \"" << input << "\"";
   }
@@ -43,19 +33,19 @@ PdfOperation PdfEngine::merge(const std::vector<std::string>& inputs, const std:
 }
 PdfOperation PdfEngine::split(const std::string& input, const std::string& output) {
   std::ostringstream cmd;
-  cmd << GS_CMD << " -q -dNOPAUSE -dBATCH -dSAFER -sDEVICE=pdfwrite -sOutputFile=\"" << output << "\" \"" << input << "\"";
+  cmd << "gs -q -dNOPAUSE -dBATCH -dSAFER -sDEVICE=pdfwrite -sOutputFile=\"" << output << "\" \"" << input << "\"";
   int result = std::system(cmd.str().c_str());
   return {input, output, "split", result == 0 ? "api" : "error"};
 }
 PdfOperation PdfEngine::add_page_numbers(const std::string& input, const std::string& output) {
   std::ostringstream cmd;
-  cmd << GS_CMD << " -q -dNOPAUSE -dBATCH -dSAFER -sDEVICE=pdfwrite -sOutputFile=\"" << output << "\" \"" << input << "\"";
+  cmd << "gs -q -dNOPAUSE -dBATCH -dSAFER -sDEVICE=pdfwrite -sOutputFile=\"" << output << "\" \"" << input << "\"";
   int result = std::system(cmd.str().c_str());
   return {input, output, "add_page_numbers", result == 0 ? "api" : "error"};
 }
 PdfOperation PdfEngine::rotate_pages(const std::string& input, const std::string& output, int angle) {
   std::ostringstream cmd;
-  cmd << GS_CMD << " -q -dNOPAUSE -dBATCH -dSAFER -sDEVICE=pdfwrite -sOutputFile=\"" << output << "\" \"" << input << "\"";
+  cmd << "gs -q -dNOPAUSE -dBATCH -dSAFER -sDEVICE=pdfwrite -sOutputFile=\"" << output << "\" \"" << input << "\"";
   int result = std::system(cmd.str().c_str());
   return {input, output, "rotate_pages", result == 0 ? "api" : "error"};
 }
