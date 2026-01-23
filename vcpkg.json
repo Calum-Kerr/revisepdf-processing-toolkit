@@ -2,6 +2,7 @@
   "name": "revisepdf",
   "version": "0.1.0",
   "dependencies": [
-    "crow"
+    "crow",
+    "nlohmann-json"
   ]
 }
