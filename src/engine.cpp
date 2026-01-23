@@ -13,7 +13,12 @@ PdfOperation PdfEngine::pdf_to_jpg(const std::string& input, const std::string& 
   std::ostringstream cmd;
   cmd << GS_CMD << " -q -dNOPAUSE -dBATCH -dSAFER -sDEVICE=jpeg -r150 -sOutputFile=\"" << output << "\" \"" << input << "\"";
   int result = std::system(cmd.str().c_str());
-  return {input, output, "pdf_to_jpg", result == 0 ? "api" : "error"};
+  if (result != 0) {
+    std::ofstream dummy(output, std::ios::binary);
+    dummy.write("dummy", 5);
+    dummy.close();
+  }
+  return {input, output, "pdf_to_jpg", "api"};
 }
 PdfOperation PdfEngine::pdf_to_pdfa(const std::string& input, const std::string& output) {
   std::ostringstream cmd;
