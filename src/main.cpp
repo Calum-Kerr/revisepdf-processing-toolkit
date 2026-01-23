@@ -4,6 +4,8 @@
 #include <sstream>
 #include <functional>
 #include <nlohmann/json.hpp>
+#include <ctime>
+#include <cstdio>
 using json = nlohmann::json;
 void add_security_headers(crow::response& res) {
   res.set_header("Content-Security-Policy", "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'");
@@ -107,7 +109,23 @@ int main() {
     if (req.body.empty()) {
       response = {{"mode", "api"}, {"operation", "convert"}, {"status", "error"}, {"message", "no file provided"}};
     } else {
-      response = {{"mode", "api"}, {"operation", "convert"}, {"status", "ok"}, {"size", req.body.size()}};
+      std::string input_file = "/tmp/input_" + std::to_string(std::time(nullptr)) + ".pdf";
+      std::string output_file = "/tmp/output_" + std::to_string(std::time(nullptr)) + ".jpg";
+      std::ofstream out(input_file, std::ios::binary);
+      out.write(req.body.c_str(), req.body.size());
+      out.close();
+      auto op = engine.pdf_to_jpg(input_file, output_file);
+      std::ifstream in(output_file, std::ios::binary);
+      if (in.good()) {
+        std::string file_content((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
+        in.close();
+        response = {{"mode", "api"}, {"operation", "convert"}, {"status", "ok"}, {"size", file_content.size()}};
+        std::remove(input_file.c_str());
+        std::remove(output_file.c_str());
+      } else {
+        response = {{"mode", "api"}, {"operation", "convert"}, {"status", "error"}, {"message", "conversion failed"}};
+        std::remove(input_file.c_str());
+      }
     }
     auto result = crow::response(response.dump());
     result.set_header("Content-Type", "application/json");
@@ -120,7 +138,23 @@ int main() {
     if (req.body.empty()) {
       response = {{"mode", "api"}, {"operation", "compress"}, {"status", "error"}, {"message", "no file provided"}};
     } else {
-      response = {{"mode", "api"}, {"operation", "compress"}, {"status", "ok"}, {"size", req.body.size()}};
+      std::string input_file = "/tmp/input_" + std::to_string(std::time(nullptr)) + ".pdf";
+      std::string output_file = "/tmp/output_" + std::to_string(std::time(nullptr)) + ".pdf";
+      std::ofstream out(input_file, std::ios::binary);
+      out.write(req.body.c_str(), req.body.size());
+      out.close();
+      auto op = engine.compress(input_file, output_file);
+      std::ifstream in(output_file, std::ios::binary);
+      if (in.good()) {
+        std::string file_content((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
+        in.close();
+        response = {{"mode", "api"}, {"operation", "compress"}, {"status", "ok"}, {"size", file_content.size()}};
+        std::remove(input_file.c_str());
+        std::remove(output_file.c_str());
+      } else {
+        response = {{"mode", "api"}, {"operation", "compress"}, {"status", "error"}, {"message", "compression failed"}};
+        std::remove(input_file.c_str());
+      }
     }
     auto result = crow::response(response.dump());
     result.set_header("Content-Type", "application/json");
