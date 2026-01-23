@@ -155,7 +155,7 @@ int main() {
     out.write(req.body.c_str(), req.body.size());
     out.close();
     auto op = engine.pdf_to_jpg(input_file, output_file);
-    std::string actual_output = op.output;
+    std::string actual_output = op.output_path;
     std::ifstream in(actual_output, std::ios::binary);
     if (in.good()) {
       std::string file_content((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
@@ -268,7 +268,7 @@ int main() {
     out.write(req.body.c_str(), req.body.size());
     out.close();
     auto op = engine.split(input_file, output_file);
-    std::string actual_output = op.output;
+    std::string actual_output = op.output_path;
     std::ifstream in(actual_output, std::ios::binary);
     if (in.good()) {
       std::string file_content((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
