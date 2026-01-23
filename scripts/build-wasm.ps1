@@ -6,7 +6,7 @@ if (-not (Test-Path $srcFile)) {
   exit 1
 }
 Write-Host "Building WASM with emscripten..."
-emcripten -std=c++17 $srcFile -o "$wasmDir/algorithms.js" `
+emcc -std=c++17 $srcFile -o "$wasmDir/algorithms.js" `
   -s WASM=1 `
   -s ALLOW_MEMORY_GROWTH=1 `
   -s EXPORTED_FUNCTIONS="['_pdf_to_jpg','_pdf_to_pdfa','_compress','_merge','_split','_add_page_numbers','_rotate_pages']" `
