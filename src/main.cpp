@@ -3,6 +3,8 @@
 #include <fstream>
 #include <sstream>
 #include <functional>
+#include <nlohmann/json.hpp>
+using json = nlohmann::json;
 void add_security_headers(crow::response& res) {
   res.set_header("Content-Security-Policy", "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'");
   res.set_header("X-Content-Type-Options", "nosniff");
