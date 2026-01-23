@@ -15,7 +15,15 @@ const ASSETS = [
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(ASSETS);
+      return Promise.all(
+        ASSETS.map(asset => {
+          return fetch(asset).then(response => {
+            if (response.ok) {
+              return cache.put(asset, response);
+            }
+          }).catch(() => {});
+        })
+      );
     })
   );
 });
