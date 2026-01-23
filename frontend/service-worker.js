@@ -2,10 +2,15 @@ const CACHE_NAME = 'revisepdf-v1';
 const ASSETS = [
   '/',
   '/app',
+  '/features',
   '/index.html',
   '/home.html',
+  '/features.html',
   '/app.js',
-  '/manifest.json'
+  '/manifest.json',
+  '/service-worker.js',
+  '/robots.txt',
+  '/sitemap.xml'
 ];
 self.addEventListener('install', (event) => {
   event.waitUntil(
